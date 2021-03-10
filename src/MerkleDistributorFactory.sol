@@ -2,8 +2,6 @@ pragma solidity 0.6.7;
 
 import "./MerkleDistributor.sol";
 
-import "./openzeppelin/IERC20.sol";
-
 contract MerkleDistributorFactory {
     // --- Auth ---
     mapping (address => uint) public authorizedAccounts;
@@ -78,20 +76,32 @@ contract MerkleDistributorFactory {
     * @notice Send tokens to a distributor
     * @param nonce The nonce/id of the distributor to send tokens to
     */
-    function sendTokensToDistributor(uint256 nonce) external isAuthorized {
-        require(tokensToDistribute[nonce] > 0, "MerkleDistributorFactory/nothing-to-send");
-        uint256 tokensToSend = tokensToDistribute[nonce];
-        tokensToDistribute[nonce] = 0;
-        IERC20(distributedToken).transfer(distributors[nonce], tokensToSend);
-        emit SendTokensToDistributor(nonce);
+    function sendTokensToDistributor(uint256 id) external isAuthorized {
+        require(tokensToDistribute[id] > 0, "MerkleDistributorFactory/nothing-to-send");
+        uint256 tokensToSend = tokensToDistribute[id];
+        tokensToDistribute[id] = 0;
+        IERC20(distributedToken).transfer(distributors[id], tokensToSend);
+        emit SendTokensToDistributor(id);
     }
     /*
     * @notice Sent distributedToken tokens out of this contract and to a custom destination
     * @param dst The address that will receive tokens
     * @param tokenAmount The token amount to send
     */
-    function getBackTokens(address dst, uint256 tokenAmount) external isAuthorized {
+    function sendTokensToCustom(address dst, uint256 tokenAmount) external isAuthorized {
         require(dst != address(0), "MerkleDistributorFactory/null-dst");
         IERC20(distributedToken).transfer(dst, tokenAmount);
+    }
+    /*
+    * @notice This contract gives up on being an authorized address inside a specific distributor contract
+    */
+    function dropDistributorAuth(uint256 id) external isAuthorized {
+        MerkleDistributor(distributors[id]).removeAuthorization(address(this));
+    }
+    /*
+    * @notice Send tokens from a distributor contract to this contract
+    */
+    function getBackTokensFromDistributor(uint256 id, uint256 tokenAmount) external isAuthorized {
+        MerkleDistributor(distributors[id]).sendTokens(address(this), tokenAmount);
     }
 }

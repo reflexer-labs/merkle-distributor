@@ -10,8 +10,11 @@ abstract contract Hevm {
 }
 
 contract User {
-    function doClaim (MerkleDistributor distributor, uint index, uint amount, bytes32[] calldata merkleProof) external {
+    function doClaim(MerkleDistributor distributor, uint index, uint amount, bytes32[] calldata merkleProof) external {
         distributor.claim(index, address(this), amount, merkleProof);
+    }
+    function doSendTokens(MerkleDistributor distributor, address dst, uint256 tokenAmount) external {
+        distributor.sendTokens(dst, tokenAmount);
     }
 }
 
@@ -66,6 +69,27 @@ contract MerkleDistributorSmallTreeTest is DSTest {
         alice.doClaim(distributor, 1, 100, proofs);
         assertEq(prot.balanceOf(address(alice)), 100);
         assertTrue(distributor.isClaimed(1));
+    }
+
+    function test_sendTokens() public {
+        distributor.addAuthorization(address(0x1));
+        distributor.sendTokens(address(0x1), 101);
+        assertEq(prot.balanceOf(address(distributor)), 100);
+        assertEq(prot.balanceOf(address(0x1)), 101);
+    }
+
+    function testFail_send_tokens_by_unauthed() public {
+        distributor.addAuthorization(address(0x1));
+        alice.doSendTokens(distributor, address(0x1), 101);
+    }
+
+    function testFail_send_tokens_to_unauthed() public {
+        distributor.sendTokens(address(0x1), 101);
+    }
+
+    function testFail_send_tokens_to_null() public {
+        distributor.addAuthorization(address(0));
+        distributor.sendTokens(address(0), 101);
     }
 
     function testFail_claim_twice() public {

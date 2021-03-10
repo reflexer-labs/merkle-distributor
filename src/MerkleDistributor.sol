@@ -8,6 +8,32 @@ import "./openzeppelin/MerkleProof.sol";
 import "./interfaces/IMerkleDistributor.sol";
 
 contract MerkleDistributor is IMerkleDistributor {
+    // --- Auth ---
+    mapping (address => uint) public authorizedAccounts;
+    /**
+     * @notice Add auth to an account
+     * @param account Account to add auth to
+     */
+    function addAuthorization(address account) virtual external isAuthorized {
+        authorizedAccounts[account] = 1;
+        emit AddAuthorization(account);
+    }
+    /**
+     * @notice Remove auth from an account
+     * @param account Account to remove auth from
+     */
+    function removeAuthorization(address account) virtual external isAuthorized {
+        authorizedAccounts[account] = 0;
+        emit RemoveAuthorization(account);
+    }
+    /**
+    * @notice Checks whether msg.sender can call an authed function
+    **/
+    modifier isAuthorized {
+        require(authorizedAccounts[msg.sender] == 1, "MerkleDistributorFactory/account-not-authorized");
+        _;
+    }
+
     // The token being distributed
     address public immutable override token;
     // The merkle root of all addresses that get a distribution
@@ -17,8 +43,24 @@ contract MerkleDistributor is IMerkleDistributor {
     mapping(uint256 => uint256) private claimedBitMap;
 
     constructor(address token_, bytes32 merkleRoot_) public {
-        token = token_;
-        merkleRoot = merkleRoot_;
+        authorizedAccounts[msg.sender] = 1;
+        token                          = token_;
+        merkleRoot                     = merkleRoot_;
+
+        emit AddAuthorization(msg.sender);
+    }
+
+    // --- Administration ---
+    /*
+    * @notice Send tokens to an authorized address
+    * @param dst The address to send tokens to
+    * @param tokenAmount The amount of tokens to send
+    */
+    function sendTokens(address dst, uint256 tokenAmount) external override isAuthorized {
+        require(dst != address(0), "MerkleDistributorFactory/null-dst");
+        require(authorizedAccounts[dst] == 1, "MerkleDistributorFactory/dst-is-not-authed");
+        IERC20(token).transfer(dst, tokenAmount);
+        emit SendTokens(dst, tokenAmount);
     }
 
     /*
