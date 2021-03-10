@@ -2,6 +2,8 @@ pragma solidity 0.6.7;
 
 import "./MerkleDistributor.sol";
 
+import "./openzeppelin/IERC20.sol";
+
 contract MerkleDistributorFactory {
     // --- Auth ---
     mapping (address => uint) public authorizedAccounts;
@@ -36,11 +38,14 @@ contract MerkleDistributorFactory {
     address public distributedToken;
     // Mapping of ID => distributor address
     mapping(uint256 => address) public distributors;
+    // Tokens left to distribute to every distributor
+    mapping(uint256 => uint256) public tokensToDistribute;
 
     // --- Events ---
     event AddAuthorization(address account);
     event RemoveAuthorization(address account);
-    event DeployDistributor(uint256 id, address distributor);
+    event DeployDistributor(uint256 id, address distributor, uint256 tokenAmount);
+    event SendTokensToDistributor(uint256 id);
 
     constructor(address distributedToken_) public {
         require(distributedToken_ != address(0), "MerkleDistributorFactory/null-distributed-token");
@@ -61,10 +66,32 @@ contract MerkleDistributorFactory {
     * @notice Deploy a new merkle distributor
     * @param merkleRoot The merkle root used in the distributor
     */
-    function deployDistributor(bytes32 merkleRoot) external isAuthorized {
-        nonce = addition(nonce, 1);
-        address newDistributor = address(new MerkleDistributor(distributedToken, merkleRoot));
-        distributors[nonce]    = newDistributor;
-        emit DeployDistributor(nonce, newDistributor);
+    function deployDistributor(bytes32 merkleRoot, uint256 tokenAmount) external isAuthorized {
+        require(tokenAmount > 0, "MerkleDistributorFactory/null-token-amount");
+        nonce                     = addition(nonce, 1);
+        address newDistributor    = address(new MerkleDistributor(distributedToken, merkleRoot));
+        distributors[nonce]       = newDistributor;
+        tokensToDistribute[nonce] = tokenAmount;
+        emit DeployDistributor(nonce, newDistributor, tokenAmount);
+    }
+    /*
+    * @notice Send tokens to a distributor
+    * @param nonce The nonce/id of the distributor to send tokens to
+    */
+    function sendTokensToDistributor(uint256 nonce) external isAuthorized {
+        require(tokensToDistribute[tokenAmount] > 0, "MerkleDistributorFactory/nothing-to-send");
+        uint256 tokensToSend = tokensToDistribute[tokenAmount];
+        tokensToDistribute[tokenAmount] = 0;
+        IERC20(distributedToken).transfer(distributors[nonce], tokensToSend);
+        emit SendTokensToDistributor(nonce);
+    }
+    /*
+    * @notice Sent distributedToken tokens out of this contract and to a custom destination
+    * @param dst The address that will receive tokens
+    * @param tokenAmount The token amount to send
+    */
+    function getBackTokens(address dst, uint256 tokenAmount) external isAuthorized {
+        require(dst != address(0), "MerkleDistributorFactory/null-dst");
+        IERC20(distributedToken).transfer(dst, tokenAmount);
     }
 }

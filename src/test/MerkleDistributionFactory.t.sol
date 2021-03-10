@@ -10,8 +10,8 @@ abstract contract Hevm {
 }
 
 contract User {
-    function doDeployDistributor (MerkleDistributorFactory factory, bytes32 merkleRoot) external {
-        factory.deployDistributor(merkleRoot);
+    function doDeployDistributor (MerkleDistributorFactory factory, bytes32 merkleRoot, uint256 tokenAmount) external {
+        factory.deployDistributor(merkleRoot, tokenAmount);
     }
 }
 
@@ -41,11 +41,12 @@ contract MerkleDistributorFactoryTest is DSTest {
 
     function test_deploy_distributor_fuzz(bytes32[8] memory merkleRoot) public {
         for (uint i = 0; i < merkleRoot.length; i++) {
-            factory.deployDistributor(merkleRoot[0]);
+            factory.deployDistributor(merkleRoot[0], i * 1E18);
 
             assertEq(factory.authorizedAccounts(address(this)), uint(1));
             assertEq(factory.nonce(), i + 1);
             assertEq(factory.distributedToken(), address(prot));
+            assertEq(factory.tokensToDistribute(i + 1), i * 1E18);
 
             assertEq(MerkleDistributor(factory.distributors(i + 1)).token(), address(prot));
             assertEq(MerkleDistributor(factory.distributors(i + 1)).merkleRoot(), merkleRoot[0]);
@@ -53,6 +54,6 @@ contract MerkleDistributorFactoryTest is DSTest {
     }
 
     function testFail_deploy_unauthorized(bytes32 merkleRoot) public {
-        alice.doDeployDistributor(factory, merkleRoot);
+        alice.doDeployDistributor(factory, merkleRoot, 1E18);
     }
 }
