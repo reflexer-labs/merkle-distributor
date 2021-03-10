@@ -10,6 +10,11 @@ abstract contract Hevm {
 }
 
 contract User {
+    function deployRandomDistributor() external returns (address) {
+        address distributor = address(new MerkleDistributor(address(0x1), keccak256(abi.encode("string"))));
+        return distributor;
+    }
+
     function doClaim(MerkleDistributor distributor, uint index, uint amount, bytes32[] calldata merkleProof) external {
         distributor.claim(index, address(this), amount, merkleProof);
     }
@@ -55,6 +60,9 @@ contract MerkleDistributorSmallTreeTest is DSTest {
     function test_correct_setup() public {
         assertEq(distributor.token(), address(prot));
         assertEq(distributor.merkleRoot(), merkleRoot);
+        assertEq(distributor.deploymentTime(), now);
+        assertEq(distributor.owner(), address(this));
+        assertTrue(distributor.timelapseUntilWithdrawWindow() > 0);
     }
 
     function test_claim() public {
@@ -72,23 +80,50 @@ contract MerkleDistributorSmallTreeTest is DSTest {
     }
 
     function test_sendTokens() public {
-        distributor.addAuthorization(address(0x1));
         distributor.sendTokens(address(0x1), 101);
         assertEq(prot.balanceOf(address(distributor)), 100);
         assertEq(prot.balanceOf(address(0x1)), 101);
     }
 
     function testFail_send_tokens_by_unauthed() public {
-        distributor.addAuthorization(address(0x1));
         alice.doSendTokens(distributor, address(0x1), 101);
     }
 
-    function testFail_send_tokens_to_unauthed() public {
+    function test_give_up_auth_send_tokens_as_owner() public {
+        distributor.removeAuthorization(address(this));
+
+        hevm.warp(now + distributor.timelapseUntilWithdrawWindow() + 1);
+        distributor.sendTokens(address(0x1), 101);
+
+        assertEq(prot.balanceOf(address(distributor)), 100);
+        assertEq(prot.balanceOf(address(0x1)), 101);
+    }
+
+    function test_send_tokens_as_auth_after_window_opens() public {
+        distributor.addAuthorization(address(alice));
+
+        hevm.warp(now + distributor.timelapseUntilWithdrawWindow() + 1);
+        alice.doSendTokens(distributor, address(0x1), 101);
+
+        assertEq(prot.balanceOf(address(distributor)), 100);
+        assertEq(prot.balanceOf(address(0x1)), 101);
+    }
+
+    function testFail_send_tokens_as_owner_before_window_opens() public {
+        distributor.removeAuthorization(address(this));
         distributor.sendTokens(address(0x1), 101);
     }
 
+    function testFail_send_tokens_as_non_owner_before_window_opens() public {
+        alice.doSendTokens(distributor, address(0x1), 101);
+    }
+
+    function testFail_send_tokens_as_non_owner_after_window_opens() public {
+        hevm.warp(now + distributor.timelapseUntilWithdrawWindow() + 1);
+        alice.doSendTokens(distributor, address(0x1), 101);
+    }
+
     function testFail_send_tokens_to_null() public {
-        distributor.addAuthorization(address(0));
         distributor.sendTokens(address(0), 101);
     }
 

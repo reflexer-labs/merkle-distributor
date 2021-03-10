@@ -33,21 +33,50 @@ contract MerkleDistributor is IMerkleDistributor {
         require(authorizedAccounts[msg.sender] == 1, "MerkleDistributorFactory/account-not-authorized");
         _;
     }
+    /*
+    * @notify Checks whether an address can send tokens out of this contract
+    */
+    modifier canSendTokens {
+        require(
+          either(authorizedAccounts[msg.sender] == 1, both(owner == msg.sender, now >= addition(deploymentTime, timelapseUntilWithdrawWindow))),
+          "MerkleDistributorFactory/cannot-send-tokens"
+        );
+        _;
+    }
 
     // The token being distributed
     address public immutable override token;
+    // The owner of this contract
+    address public immutable override owner;
     // The merkle root of all addresses that get a distribution
     bytes32 public immutable override merkleRoot;
+    // Timestamp when this contract was deployed
+    uint256 public immutable override deploymentTime;
 
     // This is a packed array of booleans
     mapping(uint256 => uint256) private claimedBitMap;
 
     constructor(address token_, bytes32 merkleRoot_) public {
         authorizedAccounts[msg.sender] = 1;
+        owner                          = msg.sender;
         token                          = token_;
         merkleRoot                     = merkleRoot_;
+        deploymentTime                 = now;
 
         emit AddAuthorization(msg.sender);
+    }
+
+    // --- Math ---
+    function addition(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require((z = x + y) >= x, "MerkleDistributorFactory/add-uint-uint-overflow");
+    }
+
+    // --- Boolean Logic ---
+    function either(bool x, bool y) internal pure returns (bool z) {
+        assembly{ z := or(x, y)}
+    }
+    function both(bool x, bool y) internal pure returns (bool z) {
+        assembly{ z := and(x, y)}
     }
 
     // --- Administration ---
@@ -56,9 +85,8 @@ contract MerkleDistributor is IMerkleDistributor {
     * @param dst The address to send tokens to
     * @param tokenAmount The amount of tokens to send
     */
-    function sendTokens(address dst, uint256 tokenAmount) external override isAuthorized {
+    function sendTokens(address dst, uint256 tokenAmount) external override canSendTokens {
         require(dst != address(0), "MerkleDistributorFactory/null-dst");
-        require(authorizedAccounts[dst] == 1, "MerkleDistributorFactory/dst-is-not-authed");
         IERC20(token).transfer(dst, tokenAmount);
         emit SendTokens(dst, tokenAmount);
     }

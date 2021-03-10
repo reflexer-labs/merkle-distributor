@@ -5,10 +5,17 @@ pragma solidity >=0.5.0;
 
 // Allows anyone to claim a token if they exist in a merkle root
 abstract contract IMerkleDistributor {
+    // Time from the moment this contract is deployed and until the owner can withdraw leftover tokens
+    uint256 public constant timelapseUntilWithdrawWindow = 365 days;
+
     // Returns the address of the token distributed by this contract
     function token() virtual external view returns (address);
     // Returns the merkle root of the merkle tree containing account balances available to claim
     function merkleRoot() virtual external view returns (bytes32);
+    // Returns the timestamp when this contract was deployed
+    function deploymentTime() virtual external view returns (uint256);
+    // Returns the address for the owner of this contract
+    function owner() virtual external view returns (address);
     // Returns true if the index has been marked claimed
     function isClaimed(uint256 index) virtual external view returns (bool);
     // Send tokens to an address without that address claiming them
