@@ -10,8 +10,14 @@ abstract contract Hevm {
 }
 
 contract User {
-    function doDeployDistributor (MerkleDistributorFactory factory, bytes32 merkleRoot, uint256 tokenAmount) external {
+    function doDeployDistributor(MerkleDistributorFactory factory, bytes32 merkleRoot, uint256 tokenAmount) external {
         factory.deployDistributor(merkleRoot, tokenAmount);
+    }
+    function doSendTokensToDistributor(MerkleDistributorFactory factory, uint256 id) external {
+        factory.sendTokensToDistributor(id);
+    }
+    function doGetBackTokens(MerkleDistributorFactory factory, address dst, uint256 tokenAmount) external {
+        factory.getBackTokens(dst, tokenAmount);
     }
 }
 
@@ -37,6 +43,51 @@ contract MerkleDistributorFactoryTest is DSTest {
         assertEq(factory.authorizedAccounts(address(this)), uint(1));
         assertEq(factory.nonce(), 0);
         assertEq(factory.distributedToken(), address(prot));
+    }
+
+    function test_send_tokens_to_distributor() public {
+        prot.mint(address(factory), 5E18);
+        factory.deployDistributor(keccak256(abi.encode("seed")), 5E18);
+        factory.sendTokensToDistributor(1);
+
+        assertEq(prot.balanceOf(address(factory)), 0);
+        assertEq(prot.balanceOf(factory.distributors(1)), 5E18);
+    }
+
+    function testFail_send_tokens_to_same_distributor_twice() public {
+        prot.mint(address(factory), 10E18);
+        factory.deployDistributor(keccak256(abi.encode("seed")), 5E18);
+        factory.sendTokensToDistributor(1);
+        factory.sendTokensToDistributor(1);
+    }
+
+    function testFail_send_tokens_to_distributor_by_unauthed() public {
+        prot.mint(address(factory), 10E18);
+        factory.deployDistributor(keccak256(abi.encode("seed")), 5E18);
+        alice.doSendTokensToDistributor(factory, 1);
+    }
+
+    function test_get_back_tokens() public {
+        prot.mint(address(factory), 10E18);
+        factory.getBackTokens(address(0x1), 5E18);
+
+        assertEq(prot.balanceOf(address(factory)), 5E18);
+        assertEq(prot.balanceOf(address(0x1)), 5E18);
+
+        factory.getBackTokens(address(0x1), 5E18);
+
+        assertEq(prot.balanceOf(address(factory)), 0);
+        assertEq(prot.balanceOf(address(0x1)), 10E18);
+    }
+
+    function testFail_get_back_tokens_by_unauthed() public {
+        prot.mint(address(factory), 10E18);
+        alice.doGetBackTokens(factory, address(0x1), 5E18);
+    }
+
+    function testFail_get_back_tokens_send_to_addr_zero() public {
+        prot.mint(address(factory), 10E18);
+        factory.getBackTokens(address(0), 5E18);
     }
 
     function test_deploy_distributor_fuzz(bytes32[8] memory merkleRoot) public {

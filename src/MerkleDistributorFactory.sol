@@ -79,9 +79,9 @@ contract MerkleDistributorFactory {
     * @param nonce The nonce/id of the distributor to send tokens to
     */
     function sendTokensToDistributor(uint256 nonce) external isAuthorized {
-        require(tokensToDistribute[tokenAmount] > 0, "MerkleDistributorFactory/nothing-to-send");
-        uint256 tokensToSend = tokensToDistribute[tokenAmount];
-        tokensToDistribute[tokenAmount] = 0;
+        require(tokensToDistribute[nonce] > 0, "MerkleDistributorFactory/nothing-to-send");
+        uint256 tokensToSend = tokensToDistribute[nonce];
+        tokensToDistribute[nonce] = 0;
         IERC20(distributedToken).transfer(distributors[nonce], tokensToSend);
         emit SendTokensToDistributor(nonce);
     }

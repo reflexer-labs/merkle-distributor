@@ -145,7 +145,7 @@ contract MerkleDistributorLargeTreeTest is DSTest {
     }
 
     function setupUsers() internal {
-        // we're using a 99 user tree, below are 8 randomly picked
+        // we're using a 99 user tree, below are 8 randomly picked accounts
         // "merkleRoot": "0x65b315f4565a40f738cbaaef7dbab4ddefa14620407507d0f2d5cdbd1d8063f6",
         // "tokenTotal": "0x1356",
         bytes32[] memory proofs = new bytes32[](7);
@@ -209,7 +209,7 @@ contract MerkleDistributorLargeTreeTest is DSTest {
         proofs[4] = bytes32(0x2c590d853eb730cb7a52242ec00c7f609bf257003cb56b32bcb3aa68754bb20c);
         proofs[5] = bytes32(0x8179399e0d53673ae8fb6bd81fc538ebb472c9e683173e26cd489cd6c53cb84c);
         proofs[6] = bytes32(0xfdc832bf88b1b4d2327f89edcab7968db8804bfd819a40de7d9015178424b0b7);
-        users.push(UserData(0x5A553d59435Df0688fd5dEa1aa66C7430541ffB3, 28, 0x63, proofs));        
+        users.push(UserData(0x5A553d59435Df0688fd5dEa1aa66C7430541ffB3, 28, 0x63, proofs));
 
         proofs = new bytes32[](7);
         proofs[0] = bytes32(0x0a0177f7752de1127d9c349677f58cd25b59355a27b29cd3e77fd49f6bc30d9a);
@@ -238,8 +238,8 @@ contract MerkleDistributorLargeTreeTest is DSTest {
         if (user1.index != user2.index) {
             distributor.claim(user2.index, user2.user, user2.amount, user2.proofs);
             assertEq(prot.balanceOf(user2.user), user2.amount);
-            assertTrue(distributor.isClaimed(user2.index));  
-        }      
+            assertTrue(distributor.isClaimed(user2.index));
+        }
     }
 
     function testFail_claim_twice(uint userSeed) public {
