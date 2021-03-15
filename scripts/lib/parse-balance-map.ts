@@ -3,7 +3,7 @@ import BalanceTree from "./balance-tree";
 
 const { isAddress, getAddress } = utils;
 
-interface MerkleDistributorInfo {
+export interface MerkleDistributorInfo {
   merkleRoot: string;
   tokenTotal: string;
   description: string;

@@ -7,7 +7,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "generate-merkle-root:example": "ts-node scripts/generate-merkle-root.ts --input scripts/example_input.csv --output scripts/example_output.json --description 'Arbitrary test distribution'"
+    "generate-merkle-root": "ts-node scripts/generate-merkle-root.ts",
+    "generate-merkle-root:example": "ts-node scripts/generate-merkle-root.ts --input scripts/example_input.csv --network kovan --description 'Arbitrary test distribution'",
+    "publish-distribution": "gh-pages -d scripts/gh-page"
   },
   "repository": {
     "type": "git",
@@ -30,6 +32,7 @@
     "typescript": "^4.2.3"
   },
   "devDependencies": {
-    "@types/node": "^14.14.34"
+    "@types/node": "^14.14.34",
+    "gh-pages": "^3.1.0"
   }
 }
