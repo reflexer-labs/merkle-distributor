@@ -1,0 +1,39 @@
+{
+  "name": "merkle-distributor",
+  "version": "1.0.0",
+  "description": "",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate-merkle-root": "ts-node scripts/generate-merkle-root.ts",
+    "generate-merkle-root:example": "ts-node scripts/generate-merkle-root.ts --input scripts/example_input.csv --network kovan --description 'Arbitrary test distribution'",
+    "verify-merkle-roots": "ts-node scripts/verify-merkle-roots.ts",
+    "publish-distribution": "gh-pages -d scripts/gh-page"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reflexer-labs/merkle-distributor.git"
+  },
+  "author": "",
+  "license": "GPL",
+  "bugs": {
+    "url": "https://github.com/reflexer-labs/merkle-distributor/issues"
+  },
+  "homepage": "https://github.com/reflexer-labs/merkle-distributor#readme",
+  "dependencies": {
+    "@types/chai": "^4.2.15",
+    "@types/mocha": "^8.2.1",
+    "chai": "^4.3.4",
+    "commander": "^7.1.0",
+    "ethereumjs-util": "^7.0.9",
+    "mocha": "^8.3.2",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.34",
+    "gh-pages": "^3.1.0"
+  }
+}
