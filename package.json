@@ -9,6 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate-merkle-root": "ts-node scripts/generate-merkle-root.ts",
     "generate-merkle-root:example": "ts-node scripts/generate-merkle-root.ts --input scripts/example_input.csv --network kovan --description 'Arbitrary test distribution'",
+    "verify-merkle-roots": "ts-node scripts/verify-merkle-roots.ts",
     "publish-distribution": "gh-pages -d scripts/gh-page"
   },
   "repository": {
