@@ -16,8 +16,8 @@ export interface MerkleDistributorInfo {
   };
 }
 
-type OldFormat = { [account: string]: number | string };
-type NewFormat = { address: string; earnings: string};
+type OldFormat = { [account: string]: string };
+type NewFormat = { address: string; earnings: string };
 
 export function parseBalanceMap(
   balances: OldFormat,
@@ -25,11 +25,11 @@ export function parseBalanceMap(
 ): MerkleDistributorInfo {
   // if balances are in an old format, process them
   const balancesInNewFormat: NewFormat[] = Object.keys(balances).map(
-        (account): NewFormat => ({
-          address: account,
-          earnings: `0x${balances[account].toString(16)}`,
-        })
-      );
+    (account): NewFormat => ({
+      address: account,
+      earnings: balances[account],
+    })
+  );
   const dataByAddress = balancesInNewFormat.reduce<{
     [address: string]: {
       amount: BigNumber;

@@ -31,13 +31,14 @@ fs.readFileSync(program.opts().input, "utf8")
   .map((x) => {
     const kv = x.split(",");
     if (kv[0] === "" || kv[0].slice(0, 2) !== "0x") return;
+
     // Convert number to wad
-    json[kv[0]] = utils.parseEther(Number(kv[1]).toFixed(18)).toString();
+    json[kv[0]] = utils.parseEther(kv[1]).toString();
   });
 
 const newDistribution = parseBalanceMap(json, program.opts().description);
 
-const outPath = `scripts/gh-page/${program.opts().network}.json`
+const outPath = `scripts/gh-page/${program.opts().network}.json`;
 const allDistributions: MerkleDistributorInfo[] = JSON.parse(
   fs.readFileSync(outPath, "utf8")
 );
