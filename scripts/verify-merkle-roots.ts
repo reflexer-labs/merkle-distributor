@@ -73,7 +73,10 @@ const getRoot = (balances: { account: string; amount: BigNumber; index: number }
 
 
 const verifyDistribution = (json: MerkleDistributorInfo) => {
-    console.log(`Check distribution with ${Object.keys(json.recipients).length} recipients`)
+    const recipientCont = Object.keys(json.recipients).length
+    if(recipientCont === 0) return;
+    
+    console.log(`Check distribution with ${recipientCont} recipients`)
 
     const merkleRootHex = json.merkleRoot
     const merkleRoot = Buffer.from(merkleRootHex.slice(2), 'hex')
