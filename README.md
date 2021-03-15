@@ -1,4 +1,4 @@
-## Creating a distribution
+## Create a distribution
 
 ```
 npm i -d
@@ -17,4 +17,4 @@ npm run publish-distribution
 
 ```
 
-`input.csv` should be a CSV file with the address and amount to be airdropped. The amount is a float with 18 decimal (not a wad).
+`input.csv` should be a CSV file with the addresses and amounts to be airdropped, see `scripts/example_input.csv`. The amount is a float with 18 decimal (not a wad).
