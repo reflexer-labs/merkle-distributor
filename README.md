@@ -1,5 +1,6 @@
 # Create a distribution
 
+
 ```
 npm i -d
 
@@ -8,15 +9,12 @@ npm run generate-merkle-root -- --input input.csv --network <kovan|mainnet> --de
 
 # Verify that the merkle path are correct and match the root
 npm run verify-merkle-roots
-
-# Submit a PR and review
-git checkout -b new-airdrop
-git add scripts/gh-page/*
-git commit -m"New airdrop"
-gh pr create
 ```
 
 `input.csv` should be a CSV file with the addresses and amounts to be airdropped, see `scripts/example_input.csv`. The amount is a float with 18 decimal (not a wad).
+
+The result are exported in `scripts/merkle-paths-output/`
+
 ## Deploy the distributor and send the tokens with geb-console
 ```
 🗿 > tx = geb.contracts.merkleDistributorFactory.deployDistributor("<MERKLE ROOT GENERATED ABOVE>", BigNumber.from("<TOTAL TOKEN AMOUNT GENERATED ABOVE>"))
@@ -26,13 +24,12 @@ gh pr create
 🗿 > metamask(tx)
 ```
 
-## Publish the new merkle paths on gh-page
-```
-npm run publish-distribution 
-```
-The merkle paths file for the front-end will be located at:
+## Publish the new merkle paths
 
-Mainnet: https://reflexer-labs.github.io/merkle-distributor/mainnet.json
+In `scripts/merkle-paths-server` you can find the code for a simple merkle path server deployed on Cloudflare Workers. Check the README in the directory to deploy the worker.
 
-Kovan: https://reflexer-labs.github.io/merkle-distributor/kovan.json
-
+The publish the new distribution on the server:
+1. Go to Go https://dash.cloudflare.com/ login
+2. Go to the Workers page, go to tab KV 
+3. Click on view the MERKLE_DISTRIBUTOR
+4. Upload the files in `scripts/merkle-paths-output/` to their respective field.

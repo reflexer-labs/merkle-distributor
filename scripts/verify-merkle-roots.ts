@@ -111,9 +111,9 @@ const verifyDistribution = (json: MerkleDistributorInfo) => {
 const getJson = (path: string): MerkleDistributorInfo[] => JSON.parse(fs.readFileSync(path, 'utf-8'))
 
 console.log("Check kovan...")
-const kovan: MerkleDistributorInfo[] = getJson('scripts/gh-page/kovan.json')
+const kovan: MerkleDistributorInfo[] = getJson('scripts/merkle-paths-output/kovan.json')
 kovan.forEach(x => verifyDistribution(x))
 
 console.log("Check mainnet...")
-const mainnet: MerkleDistributorInfo[] = getJson('scripts/gh-page/mainnet.json')
+const mainnet: MerkleDistributorInfo[] = getJson('scripts/merkle-paths-output/mainnet.json')
 mainnet.forEach(x => verifyDistribution(x))

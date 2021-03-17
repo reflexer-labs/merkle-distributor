@@ -38,7 +38,7 @@ fs.readFileSync(program.opts().input, "utf8")
 
 const newDistribution = parseBalanceMap(json, program.opts().description);
 
-const outPath = `scripts/gh-page/${program.opts().network}.json`;
+const outPath = `scripts/merkle-paths-output/${program.opts().network}.json`;
 const allDistributions: MerkleDistributorInfo[] = JSON.parse(
   fs.readFileSync(outPath, "utf8")
 );
