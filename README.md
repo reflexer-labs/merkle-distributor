@@ -30,6 +30,6 @@ In `scripts/merkle-paths-server` you can find the code for a simple merkle path 
 
 The publish the new distribution on the server:
 1. Go to Go https://dash.cloudflare.com/ login
-2. Go to the Workers page, go to tab KV 
-3. Click on view the MERKLE_DISTRIBUTOR
+2. Go to the Workers page, go to the KV tab
+3. Click view on the MERKLE_DISTRIBUTOR
 4. Upload the files in `scripts/merkle-paths-output/` to their respective field.
