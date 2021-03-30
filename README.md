@@ -1,11 +1,10 @@
 # Create a distribution
 
-
 ```
 npm i -d
 
 # Create the Merkle root & paths 
-npm run generate-merkle-root -- --input input.csv --network <kovan|mainnet> --description 'Short distribution description'
+npm run generate-merkle-root -- --input input.csv --network <kovan|mainnet> --description 'Short distribution description to be displayed in the FE'
 
 # Verify that the merkle path are correct and match the root
 npm run verify-merkle-roots
