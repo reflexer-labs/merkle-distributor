@@ -23,13 +23,3 @@ The results are exported in `scripts/merkle-paths-output/`
 🗿 > tx = geb.contracts.merkleDistributorFactory.sendTokensToDistributor(<ID OF THE DISTRIBUTION>)
 🗿 > metamask(tx)
 ```
-
-## Publish the new merkle paths
-
-In `scripts/merkle-paths-server` you can find the code for a simple merkle path server deployed on Cloudflare Workers. Check the README in the directory to deploy the worker.
-
-The publish the new distribution on the server:
-1. Go to https://dash.cloudflare.com/ and login
-2. Go to the Workers page and click on the KV tab
-3. Click View on MERKLE_DISTRIBUTOR
-4. Upload the files in `scripts/merkle-paths-output/` to their respective field.
