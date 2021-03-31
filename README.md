@@ -10,7 +10,7 @@ npm run generate-merkle-root -- --input input.csv --network <kovan|mainnet> --de
 npm run verify-merkle-roots
 ```
 
-`input.csv` should be a CSV file with the addresses and amounts to be airdropped, see `scripts/example_input.csv` as an example. The token amount is a float with 18 decimals (not a WAD).
+`input.csv` should be a CSV file with the addresses and amounts to be airdropped. See `scripts/example_input.csv` for an example. The token amount is a float with 18 decimals (not a WAD).
 
 The results are exported in `scripts/merkle-paths-output/`
 
