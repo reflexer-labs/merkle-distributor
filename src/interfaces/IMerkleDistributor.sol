@@ -6,7 +6,7 @@ pragma solidity >=0.5.0;
 // Allows anyone to claim a token if they exist in a merkle root
 abstract contract IMerkleDistributor {
     // Time from the moment this contract is deployed and until the owner can withdraw leftover tokens
-    uint256 public constant timelapseUntilWithdrawWindow = 365 days;
+    uint256 public constant timelapseUntilWithdrawWindow = 90 days;
 
     // Returns the address of the token distributed by this contract
     function token() virtual external view returns (address);

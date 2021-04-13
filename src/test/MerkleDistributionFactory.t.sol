@@ -142,12 +142,12 @@ contract MerkleDistributorFactoryTest is DSTest {
 
     function test_deploy_distributor_fuzz(bytes32[8] memory merkleRoot) public {
         for (uint i = 0; i < merkleRoot.length; i++) {
-            factory.deployDistributor(merkleRoot[0], i * 1E18);
+            factory.deployDistributor(merkleRoot[0], (i + 1) * 1E18);
 
             assertEq(factory.authorizedAccounts(address(this)), uint(1));
             assertEq(factory.nonce(), i + 1);
             assertEq(factory.distributedToken(), address(prot));
-            assertEq(factory.tokensToDistribute(i + 1), i * 1E18);
+            assertEq(factory.tokensToDistribute(i + 1), (i + 1) * 1E18);
 
             assertEq(MerkleDistributor(factory.distributors(i + 1)).token(), address(prot));
             assertEq(MerkleDistributor(factory.distributors(i + 1)).merkleRoot(), merkleRoot[0]);
