@@ -89,7 +89,7 @@ const verifyDistribution = (json: MerkleDistributorInfo) => {
       const proof = recipient.proof.map((p: string) => Buffer.from(p.slice(2), 'hex'))
       balances.push({ index: recipient.index, account: address, amount: BigNumber.from(recipient.amount) })
       if (verifyProof(recipient.index, address, BigNumber.from(recipient.amount), proof, merkleRoot)) {
-        console.log('Verified proof for', recipient.index, address)
+        // console.log('Verified proof for', recipient.index, address)
       } else {
         console.log('Verification for', address, 'failed')
         valid = false
