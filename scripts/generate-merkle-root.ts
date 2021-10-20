@@ -43,4 +43,4 @@ const allDistributions: MerkleDistributorInfo[] = JSON.parse(
   fs.readFileSync(outPath, "utf8")
 );
 allDistributions.push(newDistribution);
-fs.writeFileSync(outPath, JSON.stringify(allDistributions));
+fs.writeFileSync(outPath, JSON.stringify(allDistributions, null, 4));
