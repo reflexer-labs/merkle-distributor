@@ -4,10 +4,10 @@
 npm i -d
 
 # Create the Merkle root & paths 
-npm run generate-merkle-root -- --input input.csv --network <kovan|mainnet> --description 'Short distribution description to be displayed in the FE'
+npm run generate-merkle-root -- --input input.csv --network <kovan|mainnet> --description 'Community Distribution #5'
 
 # Verify that the merkle path are correct and match the root
-npm run verify-merkle-roots
+npm run verify-merkle-roots -- --network <kovan|mainnet> --id 7
 ```
 
 `input.csv` should be a CSV file with the addresses and amounts to be airdropped. See `scripts/example_input.csv` for an example. The token amount is a float with 18 decimals (not a WAD).

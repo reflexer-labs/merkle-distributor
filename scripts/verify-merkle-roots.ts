@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { BigNumber, utils } from 'ethers'
 import { MerkleDistributorInfo } from './lib/parse-balance-map'
-
+import { program } from "commander";
 
 
 const combinedHash = (first: Buffer, second: Buffer): Buffer => {
@@ -108,12 +108,18 @@ const verifyDistribution = (json: MerkleDistributorInfo) => {
     console.log('Root matches the one read from the JSON?', root === merkleRootHex.slice(2))
 }
 
-const getJson = (path: string): MerkleDistributorInfo[] => JSON.parse(fs.readFileSync(path, 'utf-8'))
+program
+  .version("0.0.0")
+  .requiredOption("-n, --network <mainnet|kovan>", "Network to publish the distribution")
+  .requiredOption("-i, --id <number>", "Distribution id on the contract");
 
-console.log("Check kovan...")
-const kovan: MerkleDistributorInfo[] = getJson('scripts/merkle-paths-output/kovan.json')
-kovan.forEach(x => verifyDistribution(x))
+program.parse(process.argv);
 
-console.log("Check mainnet...")
-const mainnet: MerkleDistributorInfo[] = getJson('scripts/merkle-paths-output/mainnet.json')
-mainnet.forEach(x => verifyDistribution(x))
+const getJson = (path: string): MerkleDistributorInfo[] => JSON.parse(fs.readFileSync(path, "utf-8"));
+
+let data: MerkleDistributorInfo[] = getJson(`scripts/merkle-paths-output/${program.opts().network}.json`);
+
+console.log(`Verifying distro ${program.opts().id} out of ${data.length} on ${program.opts().network}`)
+
+verifyDistribution(data[program.opts().id]);
+
