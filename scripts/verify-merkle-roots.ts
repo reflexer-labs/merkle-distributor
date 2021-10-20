@@ -119,7 +119,20 @@ const getJson = (path: string): MerkleDistributorInfo[] => JSON.parse(fs.readFil
 
 let data: MerkleDistributorInfo[] = getJson(`scripts/merkle-paths-output/${program.opts().network}.json`);
 
-console.log(`Verifying distro ${program.opts().id} out of ${data.length} on ${program.opts().network}`)
+for (let i in data) {
+  console.log(`Id: ${i} Contract id: ${Number(i) + 1} Distro: ${data[i].description}`);
+}
 
-verifyDistribution(data[program.opts().id]);
+console.log(`\n===============\n`);
 
+const dist = data[program.opts().id];
+
+console.log(`Verifying distro ${program.opts().id} out of ${data.length} on ${program.opts().network}`);
+console.log(`Description: ${dist.description}`);
+console.log(
+  `Amount: ${Number(BigNumber.from(dist.tokenTotal).toString())/1e18} | ${BigNumber.from(
+    dist.tokenTotal
+  ).toString()} | ${BigNumber.from(dist.tokenTotal).toHexString()}`
+);
+
+verifyDistribution(dist);
